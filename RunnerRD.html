@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Un juego de corredor increíble con monedas y acción. ¡Juega ahora!">
+  <title>Runner Game</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.monetag.com/sdk/monetag.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; background: #0e0b16; font-family: 'Arial', sans-serif; }
+    canvas { display: block; margin: 0 auto; }
+    #gameContainer { display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }
+    .header { color: #fff; font-size: 40px; text-align: center; padding: 20px; }
+    .coins { color: #ffd700; font-size: 18px; text-align: center; }
+    .btn { display: block; margin: 0 auto; background-color: #ff6347; padding: 20px 40px; border-radius: 8px; text-align: center; font-size: 24px; color: white; cursor: pointer; transition: transform 0.2s ease-in-out; }
+    .btn:hover { transform: scale(1.1); }
+  </style>
+</head>
+<body>
+  <div id="gameContainer">
+    <script>
+      const savedCoins = localStorage.getItem("coins") || 0;
+
+      const config = {
+        type: Phaser.AUTO,
+        width: 360,
+        height: 640,
+        backgroundColor: '#222',
+        scene: {
+          preload: preload,
+          create: create,
+          update: update
+        }
+      };
+
+      const game = new Phaser.Game(config);
+
+      function preload() {
+        this.load.image('playButton', 'https://i.imgur.com/8G3U9bI.png'); // ejemplo
+        this.load.image('background', 'https://i.imgur.com/0pFAZIw.jpg'); // fondo atractivo
+      }
+
+      function create() {
+        // Fondo de juego
+        this.add.image(180, 320, 'background');
+
+        // Título y texto
+        const title = this.add.text(180, 80, "Runner Game", {
+          fontSize: "36px",
+          fill: "#fff",
+          fontWeight: "bold"
+        }).setOrigin(0.5);
+
+        const coins = this.add.text(180, 150, `Monedas: ${savedCoins}`, {
+          fontSize: "22px",
+          fill: "#ffd700"
+        }).setOrigin(0.5);
+
+        // Botón para jugar
+        const playBtn = this.add.image(180, 300, 'playButton').setInteractive().setScale(0.5);
+
+        playBtn.on('pointerdown', () => {
+          // Mostrar anuncio antes de empezar (Monetag)
+          if (window.Monetag) {
+            Monetag.showInterstitialAd({
+              onAdClosed: () => {
+                // Lógica para empezar el juego
+                alert("¡Vamos a jugar! (Aquí iría el runner)");
+                // Aquí iría: this.scene.start('GameScene');
+              }
+            });
+          }
+        });
+
+        // Telegram WebApp expand
+        if (window.Telegram && Telegram.WebApp) {
+          Telegram.WebApp.expand();
+        }
+      }
+
+      function update() {
+        // Lógica del juego
+      }
+    </script>
+  </div>
+</body>
+</html>
