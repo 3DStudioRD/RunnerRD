@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Street Speed Racers</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      font-family: 'Arial', sans-serif;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    const savedData = JSON.parse(localStorage.getItem("gameData")) || {
+      coins: 1000,
+      ownedCars: ["civic"],
+      selectedCar: "civic",
+      upgrades: {
+        civic: { motor: 1, transmision: 1, neumaticos: 1, turbo: 0 }
+      }
+    };
+
+    const cars = {
+      civic: {
+        name: "Honda Civic",
+        price: 500,
+        image: "https://i.imgur.com/3Y1FqGa.png"
+      },
+      corolla: {
+        name: "Toyota Corolla",
+        price: 1000,
+        image: "https://i.imgur.com/EVJ3R7S.png"
+      },
+      skyline: {
+        name: "Nissan Skyline",
+        price: 3000,
+        image: "https://i.imgur.com/Tr5Oe6v.png"
+      }
+    };
+
+    const config = {
+      type: Phaser.AUTO,
+      width: 360,
+      height: 640,
+      backgroundColor: '#1a1a1a',
+      scene: {
+        preload,
+        create
+      }
+    };
+
+    const game = new Phaser.Game(config);
+
+    function preload() {
+      for (let id in cars) {
+        this.load.image(id, cars[id].image);
+      }
+      this.load.audio('click', 'https://assets.mixkit.co/sfx/preview/mixkit-video-game-mystery-alert-234.wav');
+    }
+
+    function create() {
+      // Expand Telegram WebApp si está disponible
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+      }
+
+      const clickSound = this.sound.add('click');
+
+      this.add.text(180, 30, "Street Speed Racers", {
+        fontSize: "24px",
+        fill: "#fff"
+      }).setOrigin(0.5);
+
+      this.add.text(180, 60, `Monedas: ${savedData.coins}`, {
+        fontSize: "18px",
+        fill: "#ffd700"
+      }).setOrigin(0.5);
+
+      let y = 110;
+      for (let id in cars) {
+        const car = cars[id];
+        const owned = savedData.ownedCars.includes(id);
+        this.add.image(60, y, id).setScale(0.2).setOrigin(0);
+        this.add.text(130, y + 10, car.name, { fontSize: "16px", fill: "#fff" });
+
+        const button = this.add.text(130, y + 40, owned ? (savedData.selectedCar === id ? "Seleccionado" : "Seleccionar") : `Comprar - ${car.price}`, {
+          fontSize: "14px",
+          backgroundColor: owned ? "#2e8b57" : "#444",
+          padding: { x: 8, y: 4 },
+          fill: "#fff"
+        }).setInteractive();
+
+        button.on('pointerdown', () => {
+          clickSound.play();
+          if (!owned && savedData.coins >= car.price) {
+            savedData.coins -= car.price;
+            savedData.ownedCars.push(id);
+            savedData.upgrades[id] = { motor: 1, transmision: 1, neumaticos: 1, turbo: 0 };
+          }
+          if (savedData.ownedCars.includes(id)) {
+            savedData.selectedCar = id;
+          }
+          localStorage.setItem("gameData", JSON.stringify(savedData));
+          location.reload();
+        });
+
+        y += 110;
+      }
+
+      this.add.text(180, 580, "By StudioRD", {
+        fontSize: "14px",
+        fill: "#888"
+      }).setOrigin(0.5);
+    }
+  </script>
+
+  <!-- Monetag (placeholder para insertar código real de Monetag) -->
+  <script>
+    // Aquí puedes pegar tu script de Monetag cuando lo tengas
+  </script>
+</body>
+</html>
